@@ -13,99 +13,118 @@
         <h1>Job Market Intel</h1>
         <p>Coleta de vagas, leitura de mercado e relatorios de hard e soft skills.</p>
       </div>
-      <div class="header-actions">
-        <button id="exportCsv">CSV</button>
-        <button id="exportReport">Relatorio</button>
-      </div>
     </header>
 
     <main>
-      <section class="toolbar">
-        <label>
-          Cargo ou palavra-chave
-          <input id="queryInput" value="analista de dados" />
-        </label>
-        <label>
-          Limite
-          <input id="limitInput" type="number" min="1" max="300" value="80" />
-        </label>
-        <button id="collectButton">Coletar Gupy</button>
-        <button id="clearButton" class="secondary">Limpar base local</button>
+      <nav class="screen-tabs" aria-label="Telas principais">
+        <button class="screen-tab active" data-screen="searchScreen">Buscar vagas</button>
+        <button class="screen-tab" data-screen="analyticsScreen">Analytics</button>
+      </nav>
+
+      <section id="searchScreen" class="screen active">
+        <section class="toolbar">
+          <label>
+            Cargo ou palavra-chave
+            <input id="queryInput" value="analista de dados" />
+          </label>
+          <label>
+            Limite
+            <input id="limitInput" type="number" min="1" max="300" value="80" />
+          </label>
+          <button id="collectButton">Coletar Gupy</button>
+          <button id="clearButton" class="secondary">Limpar base local</button>
+        </section>
+
+        <section id="status" class="status">Base local vazia. Faca uma coleta para iniciar.</section>
+
+        <section class="table-section">
+          <div class="section-heading">
+            <div>
+              <h2>Previa da base</h2>
+              <p>As vagas coletadas ficam salvas neste navegador nesta primeira versao web.</p>
+            </div>
+            <button id="exportCsv" class="secondary">CSV</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Vaga</th>
+                  <th>Empresa</th>
+                  <th>Local</th>
+                  <th>Modelo</th>
+                  <th>Hard skills</th>
+                  <th>Soft skills</th>
+                </tr>
+              </thead>
+              <tbody id="jobsTable"></tbody>
+            </table>
+          </div>
+        </section>
       </section>
 
-      <section id="status" class="status">Base local vazia. Faca uma coleta para iniciar.</section>
+      <section id="analyticsScreen" class="screen">
+        <section class="analytics-head">
+          <div>
+            <h2>Analytics de mercado</h2>
+            <p>Leitura das vagas filtradas por demanda, empresas, localizacao e senioridade.</p>
+          </div>
+          <button id="exportReport" class="secondary">Relatorio</button>
+        </section>
 
-      <section class="filters">
-        <label>
-          Busca
-          <select id="queryFilter"><option value="">Todas</option></select>
-        </label>
-        <label>
-          Empresa
-          <select id="companyFilter"><option value="">Todas</option></select>
-        </label>
-        <label>
-          Modelo
-          <select id="remoteFilter">
-            <option value="">Todos</option>
-            <option value="remote">Remoto</option>
-            <option value="onsite">Presencial/Hibrido</option>
-          </select>
-        </label>
-      </section>
+        <section class="filters">
+          <label>
+            Busca
+            <select id="queryFilter"><option value="">Todas</option></select>
+          </label>
+          <label>
+            Empresa
+            <select id="companyFilter"><option value="">Todas</option></select>
+          </label>
+          <label>
+            Modelo
+            <select id="remoteFilter">
+              <option value="">Todos</option>
+              <option value="remote">Remoto</option>
+              <option value="onsite">Presencial/Hibrido</option>
+            </select>
+          </label>
+        </section>
 
-      <section class="metrics">
-        <article><span id="metricJobs">0</span><small>Vagas</small></article>
-        <article><span id="metricCompanies">0</span><small>Empresas</small></article>
-        <article><span id="metricRemote">0%</span><small>Remotas</small></article>
-        <article><span id="metricSources">0</span><small>Fontes</small></article>
-      </section>
+        <section class="metrics">
+          <article><span id="metricJobs">0</span><small>Vagas</small></article>
+          <article><span id="metricCompanies">0</span><small>Empresas</small></article>
+          <article><span id="metricRemote">0%</span><small>Remotas</small></article>
+          <article><span id="metricSources">0</span><small>Fontes</small></article>
+        </section>
 
-      <section class="chart-row single">
-        <div id="jobsByDate" class="chart"></div>
-      </section>
+        <section class="chart-row single">
+          <div id="jobsByDate" class="chart"></div>
+        </section>
 
-      <section class="chart-row">
-        <div id="hardSkills" class="chart"></div>
-        <div id="softSkills" class="chart"></div>
-      </section>
+        <section class="chart-row">
+          <div id="hardSkills" class="chart"></div>
+          <div id="softSkills" class="chart"></div>
+        </section>
 
-      <section class="chart-row">
-        <div id="companiesChart" class="chart"></div>
-        <div id="modalityChart" class="chart"></div>
-      </section>
+        <section class="chart-row">
+          <div id="companiesChart" class="chart"></div>
+          <div id="modalityChart" class="chart"></div>
+        </section>
 
-      <section class="chart-row">
-        <div id="locationPie" class="chart"></div>
-        <div id="stateCityChart" class="chart"></div>
-      </section>
+        <section class="chart-row">
+          <div id="locationPie" class="chart"></div>
+          <div id="stateCityChart" class="chart"></div>
+        </section>
 
-      <section class="chart-row">
-        <div id="seniorityChart" class="chart"></div>
-        <div id="languagesChart" class="chart"></div>
-      </section>
+        <section class="chart-row">
+          <div id="seniorityChart" class="chart"></div>
+          <div id="languagesChart" class="chart"></div>
+        </section>
 
-      <section class="chart-row single">
-        <div id="termsTreemap" class="chart tall"></div>
-      </section>
-
-      <section class="table-section">
-        <h2>Base de vagas</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Vaga</th>
-                <th>Empresa</th>
-                <th>Local</th>
-                <th>Modelo</th>
-                <th>Hard skills</th>
-                <th>Soft skills</th>
-              </tr>
-            </thead>
-            <tbody id="jobsTable"></tbody>
-          </table>
-        </div>
+        <section class="chart-row single">
+          <div id="termsTreemap" class="chart tall"></div>
+        </section>
       </section>
     </main>
 
