@@ -66,6 +66,15 @@ function unique(values) {
   return [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function countBy(items, getter) {
   const counts = new Map();
   for (const item of items) {
@@ -173,8 +182,8 @@ function showScreen(screenId) {
 function updateFilters() {
   const selectedQuery = els.queryFilter.value;
   const selectedCompany = els.companyFilter.value;
-  els.queryFilter.innerHTML = `<option value="">Todas</option>${unique(jobs.map((job) => job.query)).map((value) => `<option>${value}</option>`).join("")}`;
-  els.companyFilter.innerHTML = `<option value="">Todas</option>${unique(jobs.map((job) => job.company)).map((value) => `<option>${value}</option>`).join("")}`;
+  els.queryFilter.innerHTML = `<option value="">Todas</option>${unique(jobs.map((job) => job.query)).map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}`;
+  els.companyFilter.innerHTML = `<option value="">Todas</option>${unique(jobs.map((job) => job.company)).map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}`;
   els.queryFilter.value = selectedQuery;
   els.companyFilter.value = selectedCompany;
 }
@@ -275,9 +284,10 @@ function render() {
 
 async function collectJobs() {
   const query = els.queryInput.value.trim();
-  const limit = Number(els.limitInput.value || 80);
+  const limit = Math.min(Math.max(Number(els.limitInput.value || 80), 1), 300);
+  els.limitInput.value = String(limit);
   els.collectButton.disabled = true;
-  setStatus("Coletando vagas da Gupy...");
+  setStatus(`Coletando vagas da Gupy para ${query || "vagas recentes gerais"}...`);
   try {
     const response = await fetch(`/api/gupy?query=${encodeURIComponent(query)}&limit=${encodeURIComponent(limit)}`);
     const payload = await response.json();
@@ -292,8 +302,11 @@ async function collectJobs() {
       }
     }
     saveJobs();
-    setStatus(`${inserted} vagas novas salvas. ${(payload.jobs || []).length - inserted} duplicadas ignoradas.${payload.errors?.length ? ` ${payload.errors.join(" ")}` : ""}`, Boolean(payload.errors?.length));
+    updateFilters();
+    if (query) els.queryFilter.value = query;
     render();
+    const shown = currentRows().length;
+    setStatus(`${inserted} vagas novas salvas para ${query || "vagas recentes gerais"}. ${(payload.jobs || []).length - inserted} duplicadas ignoradas. ${shown} vagas aparecem na previa atual.${payload.errors?.length ? ` ${payload.errors.join(" ")}` : ""}`, Boolean(payload.errors?.length));
   } catch (error) {
     setStatus(`Falha na coleta: ${error.message}`, true);
   } finally {
