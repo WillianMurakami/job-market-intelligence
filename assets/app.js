@@ -240,12 +240,15 @@ async function collectJobs() {
   collectionController = new AbortController();
   els.collectButton.disabled = true; els.stopButton.disabled = false; els.progressWrap.hidden = false; setProgress(0, 1);
   const existing = new Map(jobs.map((job) => [fingerprint(job), job]));
-  let offset = 0; let total = 0; let inserted = 0; let processed = 0;
+  let offset = 0; let total = 0; let inserted = 0; let processed = 0; let previousPageSignature = "";
   try {
     while (processed < scopeLimit) {
       const payload = await fetchPage(query, offset, collectionController.signal);
-      total = Math.min(payload.pagination.total, scopeLimit);
+      total = Math.min(Math.max(total, Number(payload.pagination.total || 0)), scopeLimit);
       if (!payload.jobs.length) break;
+      const pageSignature = payload.jobs.map(fingerprint).join("|");
+      if (pageSignature === previousPageSignature) throw new Error("A Gupy repetiu a mesma pagina; a coleta foi interrompida para evitar duplicacao infinita");
+      previousPageSignature = pageSignature;
       const batch = [];
       for (const rawJob of payload.jobs.slice(0, scopeLimit - processed)) {
         const job = { ...rawJob, storage_key: fingerprint(rawJob) };
@@ -254,7 +257,8 @@ async function collectJobs() {
       }
       await storeJobBatch(batch);
       processed += batch.length; offset = payload.pagination.nextOffset;
-      setProgress(processed, total); setStatus(`Coletando ${query || "todas as vagas"}: ${formatNumber(processed)} de ${formatNumber(total)} processadas · ${formatNumber(inserted)} novas.`);
+      const progressTotal = Number.isFinite(total) && total > 0 ? total : processed + 100;
+      setProgress(processed, progressTotal); setStatus(`Coletando ${query || "todas as vagas"}: ${formatNumber(processed)} de ${formatNumber(total || "?")} processadas · ${formatNumber(inserted)} novas.`);
       if (!payload.pagination.hasMore || processed >= scopeLimit) break;
       if (processed % 500 === 0) { jobs = [...existing.values()]; els.headerJobs.textContent = formatNumber(jobs.length); renderTable(); }
     }

@@ -103,14 +103,23 @@ export default async function handler(request, response) {
   if (query) params.jobName = query;
 
   try {
-    const upstream = await fetch(`${GUPY_ENDPOINT}?${new URLSearchParams(params)}`, { headers: { "user-agent": "JobMarketIntel/0.2" } });
+    const headers = { "user-agent": "JobMarketIntel/0.2" };
+    const upstreamRequest = fetch(`${GUPY_ENDPOINT}?${new URLSearchParams(params)}`, { headers });
+    // A Gupy informa total=100 quando o tamanho da pagina e maior que 1.
+    // Uma consulta paralela de um unico item preserva o total real para o progresso.
+    const countParams = { ...params, offset: "0", limit: "1" };
+    const countRequest = offset === 0 && limit > 1
+      ? fetch(`${GUPY_ENDPOINT}?${new URLSearchParams(countParams)}`, { headers })
+      : null;
+    const [upstream, countUpstream] = await Promise.all([upstreamRequest, countRequest]);
     if (!upstream.ok) return response.status(502).json({ jobs: [], error: `Gupy retornou HTTP ${upstream.status}.` });
     const payload = await upstream.json();
+    const countPayload = countUpstream?.ok ? await countUpstream.json() : null;
     const jobs = (Array.isArray(payload.data) ? payload.data : []).map((item) => normalizeJob(item, query));
-    const total = Number(payload.pagination?.total || jobs.length);
+    const total = Number(countPayload?.pagination?.total || payload.pagination?.total || offset + jobs.length);
     const nextOffset = offset + jobs.length;
     response.setHeader("Cache-Control", "s-maxage=120, stale-while-revalidate=300");
-    return response.status(200).json({ jobs, pagination: { total, offset, limit, nextOffset, hasMore: nextOffset < total && jobs.length > 0 } });
+    return response.status(200).json({ jobs, pagination: { total, offset, limit, nextOffset, hasMore: jobs.length === limit } });
   } catch (error) {
     return response.status(502).json({ jobs: [], error: `Falha ao conectar na Gupy: ${error.message}` });
   }
