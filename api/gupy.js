@@ -107,7 +107,7 @@ function normalizeJob(raw, query) {
 }
 
 export default async function handler(request, response) {
-  const query = String(request.query.query || "analista de dados").slice(0, 120);
+  const query = String(request.query.query || "").trim().slice(0, 120);
   const limit = Math.min(Math.max(Number(request.query.limit || 50), 1), 300);
   const jobs = [];
   const errors = [];
@@ -115,7 +115,9 @@ export default async function handler(request, response) {
 
   while (jobs.length < limit) {
     const pageLimit = Math.min(50, limit - jobs.length);
-    const url = `${GUPY_ENDPOINT}?${new URLSearchParams({ jobName: query, offset: String(offset), limit: String(pageLimit) })}`;
+    const params = { offset: String(offset), limit: String(pageLimit) };
+    if (query) params.jobName = query;
+    const url = `${GUPY_ENDPOINT}?${new URLSearchParams(params)}`;
     let upstream;
     try {
       upstream = await fetch(url, { headers: { "user-agent": "JobMarketIntel/0.1" } });
