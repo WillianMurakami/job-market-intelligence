@@ -22,10 +22,6 @@ body {
 }
 
 .app-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  align-items: center;
   padding: 24px 32px;
   background: #ffffff;
   border-bottom: 1px solid var(--line);
@@ -62,6 +58,36 @@ main {
   display: grid;
   gap: 16px;
   margin-bottom: 18px;
+}
+
+.screen-tabs {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(150px, 1fr));
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 20px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.screen-tab {
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted);
+}
+
+.screen-tab.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
 }
 
 .toolbar {
@@ -111,11 +137,6 @@ button.secondary,
 .header-actions button {
   background: #fff;
   color: var(--accent-strong);
-}
-
-.header-actions {
-  display: flex;
-  gap: 10px;
 }
 
 .status {
@@ -180,6 +201,22 @@ button.secondary,
   padding: 18px;
 }
 
+.analytics-head,
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.analytics-head {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
 .table-wrap {
   overflow: auto;
   margin-top: 12px;
@@ -218,10 +255,17 @@ th {
     flex-direction: column;
   }
 
+  .screen-tabs,
   .toolbar,
   .filters,
   .metrics,
   .chart-row {
     grid-template-columns: 1fr;
+  }
+
+  .analytics-head,
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
