@@ -1,0 +1,4 @@
+work/git-test/
+job_market_intel_app/.venv/
+job_market_intel_app/market_jobs.sqlite3
+work/pycache/
