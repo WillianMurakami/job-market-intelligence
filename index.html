@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Job Market Intel</title>
-    <link rel="stylesheet" href="/assets/styles.css" />
+    <link rel="stylesheet" href="/assets/styles.css?v=3" />
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   </head>
   <body>
@@ -25,7 +25,7 @@
         <section class="toolbar">
           <label>
             Cargo ou palavra-chave
-            <input id="queryInput" value="analista de dados" />
+            <input id="queryInput" value="analista de dados" placeholder="deixe em branco para tentar todas" />
           </label>
           <label>
             Limite
@@ -51,6 +51,8 @@
                 <tr>
                   <th>Vaga</th>
                   <th>Empresa</th>
+                  <th>Publicada em</th>
+                  <th>Dias em aberto</th>
                   <th>Local</th>
                   <th>Modelo</th>
                   <th>Hard skills</th>
@@ -128,6 +130,6 @@
       </section>
     </main>
 
-    <script src="/assets/app.js"></script>
+    <script src="/assets/app.js?v=3"></script>
   </body>
 </html>
