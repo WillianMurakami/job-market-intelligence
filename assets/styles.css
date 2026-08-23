@@ -225,7 +225,7 @@ button.secondary,
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 960px;
+  min-width: 1120px;
 }
 
 th,
@@ -241,6 +241,29 @@ th {
   color: var(--muted);
   font-size: 12px;
   text-transform: uppercase;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.tags-cell {
+  min-width: 150px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  margin: 0 5px 5px 0;
+  padding: 3px 8px;
+  border: 1px solid #c7ded9;
+  border-radius: 999px;
+  background: #eef7f4;
+  color: var(--accent-strong);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 @media (max-width: 900px) {
