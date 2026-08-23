@@ -1,135 +1,98 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Job Market Intel</title>
-    <link rel="stylesheet" href="/assets/styles.css?v=4" />
-    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-  </head>
-  <body>
-    <header class="app-header">
-      <div>
-        <h1>Job Market Intel</h1>
-        <p>Coleta de vagas, leitura de mercado e relatorios de hard e soft skills.</p>
-      </div>
-    </header>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Market Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css?v=5" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand-mark">JM</div>
+    <div class="brand-copy">
+      <span class="eyebrow">INTELIGÊNCIA DE MERCADO</span>
+      <h1>Job Market Intelligence</h1>
+      <p>O que as vagas revelam sobre competências, áreas e movimentos do mercado.</p>
+    </div>
+    <div class="database-badge"><span></span><strong id="headerJobs">0</strong> vagas na base</div>
+  </header>
 
-    <main>
-      <nav class="screen-tabs" aria-label="Telas principais">
-        <button class="screen-tab active" data-screen="searchScreen">Buscar vagas</button>
-        <button class="screen-tab" data-screen="analyticsScreen">Analytics</button>
-      </nav>
+  <main>
+    <nav class="screen-tabs" aria-label="Telas principais">
+      <button class="screen-tab active" data-screen="searchScreen"><span>01</span> Busca e vagas</button>
+      <button class="screen-tab" data-screen="analyticsScreen"><span>02</span> Análise geral</button>
+      <button class="screen-tab" data-screen="weeklyScreen"><span>03</span> Novas · 7 dias</button>
+    </nav>
 
-      <section id="searchScreen" class="screen active">
-        <section class="toolbar">
-          <label>
-            Cargo ou palavra-chave
-            <input id="queryInput" placeholder="ex.: Gerente, Produto; vazio = vagas recentes gerais" />
+    <section id="searchScreen" class="screen active">
+      <section class="hero-panel">
+        <div>
+          <span class="eyebrow">COLETA PAGINADA</span>
+          <h2>Amplie a leitura do mercado</h2>
+          <p>Busque um cargo ou deixe o campo vazio para percorrer todas as vagas disponíveis na Gupy.</p>
+        </div>
+        <div class="toolbar">
+          <label class="field-wide">Cargo ou palavra-chave
+            <input id="queryInput" placeholder="Ex.: Produto, Gerente, Dados — vazio coleta tudo" />
           </label>
-          <label>
-            Limite
-            <input id="limitInput" type="number" min="1" max="300" value="80" />
+          <label>Escopo
+            <select id="collectionScope"><option value="all">Todas as vagas</option><option value="1000">Primeiras 1.000</option><option value="5000">Primeiras 5.000</option></select>
           </label>
-          <button id="collectButton">Coletar Gupy</button>
-          <button id="clearButton" class="secondary">Limpar base local</button>
-        </section>
-
-        <section id="status" class="status">Base local vazia. Faca uma coleta para iniciar.</section>
-
-        <section class="table-section">
-          <div class="section-heading">
-            <div>
-              <h2>Previa da base</h2>
-              <p>As vagas coletadas ficam salvas neste navegador nesta primeira versao web.</p>
-            </div>
-            <button id="exportCsv" class="secondary">CSV</button>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Vaga</th>
-                  <th>Empresa</th>
-                  <th>Publicada em</th>
-                  <th>Dias em aberto</th>
-                  <th>Local</th>
-                  <th>Modelo</th>
-                  <th>Hard skills</th>
-                  <th>Soft skills</th>
-                </tr>
-              </thead>
-              <tbody id="jobsTable"></tbody>
-            </table>
-          </div>
-        </section>
+          <button id="collectButton">Iniciar coleta</button>
+          <button id="stopButton" class="secondary" disabled>Interromper</button>
+        </div>
+        <div id="progressWrap" class="progress-wrap" hidden><div id="progressBar"></div></div>
+        <section id="status" class="status">Base local vazia. Faça uma coleta para iniciar.</section>
       </section>
 
-      <section id="analyticsScreen" class="screen">
-        <section class="analytics-head">
-          <div>
-            <h2>Analytics de mercado</h2>
-            <p>Leitura das vagas filtradas por demanda, empresas, localizacao e senioridade.</p>
-          </div>
-          <button id="exportReport" class="secondary">Relatorio</button>
-        </section>
-
-        <section class="filters">
-          <label>
-            Busca
-            <select id="queryFilter"><option value="">Todas</option></select>
-          </label>
-          <label>
-            Empresa
-            <select id="companyFilter"><option value="">Todas</option></select>
-          </label>
-          <label>
-            Modelo
-            <select id="remoteFilter">
-              <option value="">Todos</option>
-              <option value="remote">Remoto</option>
-              <option value="onsite">Presencial/Hibrido</option>
-            </select>
-          </label>
-        </section>
-
-        <section class="metrics">
-          <article><span id="metricJobs">0</span><small>Vagas</small></article>
-          <article><span id="metricCompanies">0</span><small>Empresas</small></article>
-          <article><span id="metricRemote">0%</span><small>Remotas</small></article>
-          <article><span id="metricSources">0</span><small>Fontes</small></article>
-        </section>
-
-        <section class="chart-row single">
-          <div id="jobsByDate" class="chart"></div>
-        </section>
-
-        <section class="chart-row">
-          <div id="hardSkills" class="chart"></div>
-          <div id="softSkills" class="chart"></div>
-        </section>
-
-        <section class="chart-row">
-          <div id="companiesChart" class="chart"></div>
-          <div id="modalityChart" class="chart"></div>
-        </section>
-
-        <section class="chart-row">
-          <div id="locationPie" class="chart"></div>
-          <div id="stateCityChart" class="chart"></div>
-        </section>
-
-        <section class="chart-row">
-          <div id="seniorityChart" class="chart"></div>
-          <div id="languagesChart" class="chart"></div>
-        </section>
-
-        <section class="chart-row single">
-          <div id="termsTreemap" class="chart tall"></div>
-        </section>
+      <section class="filters filter-card">
+        <label>Área<select id="tableAreaFilter"><option value="">Todas as áreas</option></select></label>
+        <label>Empresa<select id="tableCompanyFilter"><option value="">Todas as empresas</option></select></label>
+        <label>Modelo<select id="tableRemoteFilter"><option value="">Todos</option><option value="remote">Remoto</option><option value="onsite">Presencial/Híbrido</option></select></label>
+        <label>Busca na base<input id="tableTextFilter" placeholder="Título ou empresa" /></label>
       </section>
-    </main>
 
-    <script src="/assets/app.js?v=4"></script>
-  </body>
+      <section class="table-section">
+        <div class="section-heading">
+          <div><span class="eyebrow">BASE COLETADA</span><h2>Vagas encontradas</h2><p id="tableSummary">Nenhuma vaga para exibir.</p></div>
+          <div class="button-row"><button id="exportCsv" class="secondary">Exportar CSV</button><button id="clearButton" class="danger-ghost">Limpar base</button></div>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>Vaga</th><th>Área</th><th>Empresa</th><th>Publicação</th><th>Local</th><th>Modelo</th><th>Hard skills</th><th>Soft skills</th></tr></thead><tbody id="jobsTable"></tbody></table></div>
+        <div class="pagination"><button id="prevPage" class="secondary">Anterior</button><span id="pageInfo">Página 1</span><label>Por página<select id="pageSize"><option>25</option><option selected>50</option><option>100</option></select></label><button id="nextPage" class="secondary">Próxima</button></div>
+      </section>
+    </section>
+
+    <section id="analyticsScreen" class="screen">
+      <section class="page-head"><div><span class="eyebrow">VISÃO CONSOLIDADA</span><h2>Análise geral do mercado</h2><p>Compare a demanda e as expectativas por macroárea.</p></div><button id="exportReport" class="secondary">Exportar relatório</button></section>
+      <section class="filters filter-card analytics-filters">
+        <label>Área<select id="analyticsAreaFilter"><option value="">Todas as áreas</option></select></label>
+        <label>Coleta<select id="queryFilter"><option value="">Todas as coletas</option></select></label>
+        <label>Empresa<select id="companyFilter"><option value="">Todas as empresas</option></select></label>
+        <label>Modelo<select id="remoteFilter"><option value="">Todos</option><option value="remote">Remoto</option><option value="onsite">Presencial/Híbrido</option></select></label>
+      </section>
+      <section id="generalMetrics" class="metrics"></section>
+      <section class="insight-grid"><article class="narrative-card"><span class="eyebrow">LEITURA RÁPIDA</span><h3>O que o mercado está pedindo</h3><div id="generalNarrative"></div></article><div id="areasChart" class="chart"></div></section>
+      <section class="chart-row single"><div id="jobsByDate" class="chart"></div></section>
+      <section class="chart-row"><div id="hardSkills" class="chart"></div><div id="softSkills" class="chart"></div></section>
+      <section class="chart-row"><div id="responsibilitiesChart" class="chart"></div><div id="companiesChart" class="chart"></div></section>
+      <section class="chart-row"><div id="modalityChart" class="chart"></div><div id="locationPie" class="chart"></div></section>
+      <section class="chart-row"><div id="seniorityChart" class="chart"></div><div id="languagesChart" class="chart"></div></section>
+    </section>
+
+    <section id="weeklyScreen" class="screen">
+      <section class="page-head weekly-head"><div><span class="eyebrow">RADAR DE OPORTUNIDADES</span><h2>Vagas publicadas nos últimos 7 dias</h2><p>Uma leitura separada dos sinais mais recentes do mercado.</p></div><div id="weeklyPeriod" class="period-chip"></div></section>
+      <section class="filters filter-card"><label>Área<select id="weeklyAreaFilter"><option value="">Todas as áreas</option></select></label><label>Empresa<select id="weeklyCompanyFilter"><option value="">Todas as empresas</option></select></label><label>Modelo<select id="weeklyRemoteFilter"><option value="">Todos</option><option value="remote">Remoto</option><option value="onsite">Presencial/Híbrido</option></select></label></section>
+      <section id="weeklyMetrics" class="metrics"></section>
+      <section class="insight-grid"><article class="narrative-card weekly"><span class="eyebrow">EXPECTATIVAS EMERGENTES</span><h3>Leitura da última semana</h3><div id="weeklyNarrative"></div></article><div id="weeklyAreasChart" class="chart"></div></section>
+      <section class="chart-row"><div id="weeklyHardSkills" class="chart"></div><div id="weeklySoftSkills" class="chart"></div></section>
+      <section class="chart-row"><div id="weeklyResponsibilities" class="chart"></div><div id="weeklyByDate" class="chart"></div></section>
+      <section class="table-section compact"><div class="section-heading"><div><span class="eyebrow">MAIS RECENTES</span><h2>Novas oportunidades</h2></div></div><div class="table-wrap"><table><thead><tr><th>Vaga</th><th>Área</th><th>Empresa</th><th>Publicação</th><th>Local</th></tr></thead><tbody id="weeklyTable"></tbody></table></div></section>
+    </section>
+  </main>
+  <script src="/assets/app.js?v=5"></script>
+</body>
 </html>

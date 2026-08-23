@@ -12,7 +12,18 @@ A raiz do projeto contem a versao preparada para Vercel:
 - `api/gupy.js`
 - `vercel.json`
 
-Ela nao depende de Streamlit em producao. A coleta Gupy roda por uma funcao serverless em `/api/gupy`, e os dados ficam salvos no navegador nesta primeira versao.
+Ela nao depende de Streamlit em producao. A coleta Gupy roda por uma funcao serverless paginada em `/api/gupy`.
+Os lotes processados ficam salvos em IndexedDB no navegador, permitindo bases maiores que o antigo limite de 300 vagas.
+
+## Telas da versao 0.2
+
+- **Busca e vagas:** coleta completa ou limitada, progresso, filtros por area e tabela paginada.
+- **Analise geral:** indicadores e graficos filtraveis por area, coleta, empresa e modelo de trabalho.
+- **Novas (7 dias):** radar exclusivo das vagas publicadas na ultima semana.
+
+As vagas sao classificadas em Negocios, Comunicacao, Direito, Saude, Tecnologia, Politecnica,
+Humanidades ou Outras areas. A ultima categoria preserva a transparencia quando nao ha evidencia
+suficiente para uma classificacao automatica segura.
 
 ## Deploy na Vercel
 
