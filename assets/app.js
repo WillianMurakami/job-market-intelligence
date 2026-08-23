@@ -34,7 +34,9 @@ const els = {
   queryFilter: document.querySelector("#queryFilter"),
   companyFilter: document.querySelector("#companyFilter"),
   remoteFilter: document.querySelector("#remoteFilter"),
-  table: document.querySelector("#jobsTable")
+  table: document.querySelector("#jobsTable"),
+  screenTabs: document.querySelectorAll(".screen-tab"),
+  screens: document.querySelectorAll(".screen")
 };
 
 const layoutBase = {
@@ -129,6 +131,20 @@ function currentRows() {
 function setStatus(message, warn = false) {
   els.status.textContent = message;
   els.status.classList.toggle("warn", warn);
+}
+
+function showScreen(screenId) {
+  els.screens.forEach((screen) => {
+    screen.classList.toggle("active", screen.id === screenId);
+  });
+  els.screenTabs.forEach((tab) => {
+    tab.classList.toggle("active", tab.dataset.screen === screenId);
+  });
+  if (screenId === "analyticsScreen") {
+    requestAnimationFrame(() => {
+      document.querySelectorAll(".chart").forEach((chart) => Plotly.Plots.resize(chart));
+    });
+  }
 }
 
 function updateFilters() {
@@ -318,5 +334,8 @@ els.exportReport.addEventListener("click", exportReport);
 els.queryFilter.addEventListener("change", render);
 els.companyFilter.addEventListener("change", render);
 els.remoteFilter.addEventListener("change", render);
+els.screenTabs.forEach((tab) => {
+  tab.addEventListener("click", () => showScreen(tab.dataset.screen));
+});
 
 render();
