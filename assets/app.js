@@ -97,6 +97,29 @@ function employmentLabel(value) {
   }[key] || value || "Nao informado";
 }
 
+function formatDate(value) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return date.toLocaleDateString("pt-BR", { timeZone: "UTC" });
+}
+
+function daysOpen(value) {
+  if (!value) return "-";
+  const published = new Date(value);
+  if (Number.isNaN(published.getTime())) return "-";
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  published.setHours(0, 0, 0, 0);
+  return Math.max(0, Math.floor((today - published) / 86400000));
+}
+
+function renderTags(values) {
+  const list = values || [];
+  if (!list.length) return '<span class="muted">-</span>';
+  return list.map((value) => `<span class="tag">${value}</span>`).join("");
+}
+
 function normalizeText(value) {
   return String(value || "")
     .normalize("NFD")
@@ -240,16 +263,18 @@ function render() {
     <tr>
       <td><a href="${job.url || "#"}" target="_blank" rel="noreferrer">${job.title || "Nao informado"}</a></td>
       <td>${job.company || "Nao informado"}</td>
+      <td>${formatDate(job.published_at)}</td>
+      <td>${daysOpen(job.published_at)}</td>
       <td>${job.is_remote ? "Remoto" : [job.city, job.state].filter(Boolean).join(", ") || "Nao informado"}</td>
       <td>${employmentLabel(job.employment_type)}</td>
-      <td>${(job.hard_skills || []).join(", ") || "-"}</td>
-      <td>${(job.soft_skills || []).join(", ") || "-"}</td>
+      <td class="tags-cell">${renderTags(job.hard_skills)}</td>
+      <td class="tags-cell">${renderTags(job.soft_skills)}</td>
     </tr>
   `).join("");
 }
 
 async function collectJobs() {
-  const query = els.queryInput.value.trim() || "analista de dados";
+  const query = els.queryInput.value.trim();
   const limit = Number(els.limitInput.value || 80);
   els.collectButton.disabled = true;
   setStatus("Coletando vagas da Gupy...");
